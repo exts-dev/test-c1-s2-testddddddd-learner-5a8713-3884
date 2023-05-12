@@ -1,0 +1,33 @@
+name: Your HTML code is valid
+on: push
+jobs:
+  valid-html-code:
+    runs-on: ubuntu-latest
+    env:
+      errors: 0
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Find <html>, <head>, <body> in index.html
+
+    - name: Find main tags in index.html
+      id: find-main-home
+      uses: nguyenvanuyn96/str-find-action@master
+      with:
+        find: "(?s)<html>.*<head>.*<body>"
+        include: "index.html"
+
+    - name: Count main tags in index.html
+      if: ${{ steps.find-main-home.outputs.fileFoundCount == 0 }}
+      run: echo "errors=$(expr ${{ env.errors }} + 1)" >> $GITHUB_ENV
+
+    # Result
+
+    - name: Errors
+      run: echo "${{ env.errors }}"
+
+    - name: Finally
+      if: ${{ env.errors > 0 }}
+      run: exit 1

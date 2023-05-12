@@ -1,0 +1,22 @@
+name: Add an index.html file
+on: push
+jobs:
+  project-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check files existence
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "index.html"
+          allow_failure: true
+
+      - name: Count index.html lines
+        id: index
+        run: echo "::set-output name=index::$(wc -l index.html | awk '{print $1;}')"
+
+      - name: index.html valid
+        if: ${{ steps.index.outputs.index == '' || steps.index.outputs.index < 3 }}
+        run: exit 1
